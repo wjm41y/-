@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#0b2b40">
+<title>捏捏小鱼 🐠</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html, body {
+    width:100%; height:100%; overflow:hidden;
+    background: linear-gradient(180deg,
+      #1b6d92 0%,
+      #12546f 22%,
+      #0b2b40 55%,
+      #061620 100%);
+    display: flex; justify-content: center; align-items: center;
+    user-select: none; -webkit-user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif;
+    position: relative;
+  }
+
+  /* ===================== 海洋背景 ===================== */
+  .ocean {
+    position: fixed;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .ray {
+    position: absolute;
+    top: -30%;
+    width: 90px;
+    height: 160%;
+    background: linear-gradient(180deg,
+      rgba(190, 235, 255, 0.26) 0%,
+      rgba(190, 235, 255, 0.09) 45%,
+      rgba(190, 235, 255, 0) 100%);
+    filter: blur(14px);
+    transform-origin: top center;
+    animation: raySway 7s ease-in-out infinite;
+  }
+  .r1 { left: 6%;  animation-delay: 0s;   animation-duration: 8s; }
+  .r2 { left: 26%; animation-delay: 1.2s; animation-duration: 6.5s; width: 60px; }
+  .r3 { left: 52%; animation-delay: 2.4s; animation-duration: 9s;   width: 110px; }
+  .r4 { left: 74%; animation-delay: 0.8s; animation-duration: 7.5s; width: 70px; }
+  .r5 { left: 90%; animation-delay: 3s;   animation-duration: 8.5s; width: 55px; }
+
+  @keyframes raySway {
+    0%, 100% { transform: rotate(14deg) translateX(-15px); opacity: 0.7; }
+    50%      { transform: rotate(14deg) translateX(20px);  opacity: 1; }
+  }
+
+  .far-fish {
+    position: absolute;
+    left: 0;
+    animation: swimAcross linear infinite;
+  }
+  .ff1 { top: 22%; width: 46px; height: 23px; animation-duration: 24s; animation-delay: 0s;   }
+  .ff2 { top: 42%; width: 38px; height: 19px; animation-duration: 30s; animation-delay: 8s;   }
+  .ff3 { top: 65%; width: 30px; height: 15px; animation-duration: 20s; animation-delay: 14s;  }
+
+  @keyframes swimAcross {
+    0%   { transform: translateX(105vw); }
+    100% { transform: translateX(-15vw); }
+  }
+
+  .ff-inner {
+    width: 100%;
+    height: 100%;
+    animation: bob ease-in-out infinite;
+  }
+  .ff1 .ff-inner { animation-duration: 3.2s; }
+  .ff2 .ff-inner { animation-duration: 4.1s; }
+  .ff3 .ff-inner { animation-duration: 2.6s; }
+
+  @keyframes bob {
+    0%, 100% { transform: translateY(0) rotate(-2deg); }
+    50%      { transform: translateY(-7px) rotate(2deg); }
+  }
+
+  .ff-inner svg {
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    display: block;
+  }
+
+  .ff-body { fill: rgba(110, 195, 230, 0.42); }
+  .ff-tail {
+    fill: rgba(110, 195, 230, 0.36);
+    transform-origin: left center;
+    transform-box: fill-box;
+    animation: tailWag 0.75s ease-in-out infinite;
+  }
+  @keyframes tailWag {
+    0%, 100% { transform: rotate(-8deg); }
+    50%      { transform: rotate(8deg); }
+  }
+
+  .ff1 .ff-body { fill: rgba(120, 205, 235, 0.5); }
+  .ff1 .ff-tail { fill: rgba(120, 205, 235, 0.42); }
+  .ff2 .ff-body { fill: rgba(100, 180, 215, 0.34); }
+  .ff2 .ff-tail { fill: rgba(100, 180, 215, 0.28); }
+  .ff3 .ff-body { fill: rgba(85, 160, 200, 0.24); }
+  .ff3 .ff-tail { fill: rgba(85, 160, 200, 0.2);  }
+
+  .seafloor {
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    width: 100%;
+    height: 100px;
+    display: block;
+  }
+
+  .weed-cluster {
+    position: absolute;
+    bottom: 28px;
+    transform-origin: bottom center;
+    animation: weedSway 3.6s ease-in-out infinite;
+  }
+  .wc1 { left: 4%;  animation-delay: 0s;   }
+  .wc2 { left: 15%; animation-delay: 0.7s; transform: scale(0.8); }
+  .wc3 { left: 71%; animation-delay: 1.4s; }
+  .wc4 { left: 83%; animation-delay: 0.4s; transform: scale(1.15); }
+  .wc5 { left: 93%; animation-delay: 1.9s; transform: scale(0.85); }
+
+  @keyframes weedSway {
+    0%, 100% { transform: rotate(-4deg); }
+    50%      { transform: rotate(4deg); }
+  }
+
+  .ocean-bubble {
+    position: absolute;
+    bottom: -40px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 30% 30%,
+      rgba(255, 255, 255, 0.55) 0%,
+      rgba(160, 222, 255, 0.12) 60%,
+      rgba(160, 222, 255, 0.04) 100%);
+    border: 1px solid rgba(190, 235, 255, 0.35);
+    animation: oceanRise linear infinite;
+  }
+  .ob1 { left: 12%; width: 8px;  height: 8px;  animation-duration: 14s; animation-delay: 0s;  }
+  .ob2 { left: 32%; width: 12px; height: 12px; animation-duration: 18s; animation-delay: 3s;  }
+  .ob3 { left: 55%; width: 6px;  height: 6px;  animation-duration: 12s; animation-delay: 7s;  }
+  .ob4 { left: 72%; width: 10px; height: 10px; animation-duration: 16s; animation-delay: 5s;  }
+  .ob5 { left: 88%; width: 14px; height: 14px; animation-duration: 20s; animation-delay: 10s; }
+  .ob6 { left: 45%; width: 9px;  height: 9px;  animation-duration: 15s; animation-delay: 12s; }
+
+  @keyframes oceanRise {
+    0%   { transform: translate(0, 0); opacity: 0; }
+    10%  { opacity: 0.9; }
+    90%  { opacity: 0.9; }
+    100% { transform: translate(18px, -105vh); opacity: 0; }
+  }
+
+  /* ===================== 切换按钮 ===================== */
+  .switch-btn {
+    position: fixed;
+    top: 30px; right: 20px;
+    width: 55px; height: 55px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    border: 2px solid rgba(255, 255, 255, 0.4);
+    color: white;
+    font-size: 24px;
+    display: flex; justify-content: center; align-items: center;
+    z-index: 999;
+    transition: transform 0.2s;
+    touch-action: manipulation;
+  }
+  .switch-btn:active { transform: scale(0.85); }
+
+  /* ===================== 隐藏彩蛋区域 ===================== */
+  /* 完全透明、无任何视觉提示，仅覆盖左下角一小块 */
+  .secret-zone {
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 76px;
+    height: 76px;
+    z-index: 998;
+    background: transparent;
+    /* 允许点击穿透到鱼身上，保持捏鱼手感 */
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* ===================== 鱼区域 ===================== */
+  .fish-wrapper {
+    animation: float 3s ease-in-out infinite;
+    position: relative;
+    display: flex; justify-content: center; align-items: center;
+    width: 300px; height: 200px;
+    z-index: 1;
+  }
+
+  .bubble-layer {
+    position: absolute;
+    inset: 0;
+    overflow: visible;
+    pointer-events: none;
+    z-index: 5;
+  }
+
+  .bubble {
+    position: absolute;
+    background: radial-gradient(circle at 30% 30%,
+      rgba(255, 255, 255, 0.6),
+      rgba(160, 222, 255, 0.15) 60%);
+    border: 1px solid rgba(190, 235, 255, 0.4);
+    border-radius: 50%;
+    bottom: -30px;
+    animation: rise 4s linear infinite;
+  }
+  .b1 { left: 10%; width: 10px; height: 10px; animation-delay: 0s; }
+  .b2 { left: 30%; width: 15px; height: 15px; animation-delay: 1.5s; }
+  .b3 { left: 70%; width: 8px; height: 8px; animation-delay: 0.8s; }
+  .b4 { left: 85%; width: 12px; height: 12px; animation-delay: 2.5s; }
+
+  @keyframes rise {
+    0% { bottom: -30px; opacity: 0; }
+    20% { opacity: 1; }
+    100% { bottom: 110%; opacity: 0; }
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0) rotate(-1deg); }
+    50% { transform: translateY(-15px) rotate(1deg); }
+  }
+
+  .fish {
+    width: 300px; height: 200px;
+    transform-origin: center bottom;
+    transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    z-index: 1;
+  }
+  .fish.squish {
+    transform: scale(1.15, 0.75) translateY(25px);
+    transition: transform 0.15s cubic-bezier(0.25, 0.8, 0.25, 1);
+  }
+
+  .fish-svg { display: none; width: 100%; height: 100%; overflow: visible; }
+  .fish-svg.active { display: block; }
+
+  /* ============ 说话气泡（缓慢淡出） ============ */
+  .speech-bubble {
+    position: absolute;
+    top: -70px;
+    left: 50%;
+    transform: translateX(-50%) scale(1);
+    transform-origin: 50% 100%;
+    background: #FFFFFF;
+    color: #333;
+    padding: 10px 18px;
+    border-radius: 20px;
+    font-size: 15px;
+    font-weight: bold;
+    white-space: nowrap;
+    opacity: 0;
+    transition: opacity 0.9s ease-out;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    pointer-events: none;
+    z-index: 10;
+  }
+  .speech-bubble::after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 8px 8px 0;
+    border-style: solid;
+    border-color: #FFFFFF transparent transparent;
+  }
+  .speech-bubble.show {
+    animation: bubblePop 0.55s ease forwards;
+    transition: none;
+  }
+
+  @keyframes bubblePop {
+    0%   { transform: translateX(-50%) scale(0); opacity: 0; }
+    45%  { transform: translateX(-50%) scale(1.18); opacity: 1; }
+    65%  { transform: translateX(-50%) scale(0.9); }
+    80%  { transform: translateX(-50%) scale(1.06); }
+    92%  { transform: translateX(-50%) scale(0.98); }
+    100% { transform: translateX(-50%) scale(1); opacity: 1; }
+  }
+
+  .hint {
+    position: fixed; left: 50%; bottom: 50px; transform: translateX(-50%);
+    color: rgba(200, 235, 255, 0.6); font-size: 14px; letter-spacing: 3px;
+    white-space: nowrap;
+    z-index: 5;
+  }
+</style>
+</head>
+<body>
+
+<!-- ===================== 隐藏彩蛋区域（左下角） ===================== -->
+<div class="secret-zone" id="secretZone"></div>
+
+<!-- ===================== 海洋背景层 ===================== -->
+<div class="ocean">
+  <div class="ray r1"></div>
+  <div class="ray r2"></div>
+  <div class="ray r3"></div>
+  <div class="ray r4"></div>
+  <div class="ray r5"></div>
+
+  <div class="far-fish ff1">
+    <div class="ff-inner">
+      <svg viewBox="0 0 60 30">
+        <path class="ff-body" d="M 4 15 Q 12 4 26 6 Q 40 8 50 15 Q 40 22 26 24 Q 12 26 4 15 Z"/>
+        <path class="ff-tail" d="M 50 15 L 58 7 Q 55 15 58 23 Z"/>
+      </svg>
+    </div>
+  </div>
+
+  <div class="far-fish ff2">
+    <div class="ff-inner">
+      <svg viewBox="0 0 60 30">
+        <path class="ff-body" d="M 4 15 Q 12 4 26 6 Q 40 8 50 15 Q 40 22 26 24 Q 12 26 4 15 Z"/>
+        <path class="ff-tail" d="M 50 15 L 58 7 Q 55 15 58 23 Z"/>
+      </svg>
+    </div>
+  </div>
+
+  <div class="far-fish ff3">
+    <div class="ff-inner">
+      <svg viewBox="0 0 60 30">
+        <path class="ff-body" d="M 4 15 Q 12 4 26 6 Q 40 8 50 15 Q 40 22 26 24 Q 12 26 4 15 Z"/>
+        <path class="ff-tail" d="M 50 15 L 58 7 Q 55 15 58 23 Z"/>
+      </svg>
+    </div>
+  </div>
+
+  <div class="ocean-bubble ob1"></div>
+  <div class="ocean-bubble ob2"></div>
+  <div class="ocean-bubble ob3"></div>
+  <div class="ocean-bubble ob4"></div>
+  <div class="ocean-bubble ob5"></div>
+  <div class="ocean-bubble ob6"></div>
+
+  <svg class="seafloor" viewBox="0 0 1440 120" preserveAspectRatio="none">
+    <defs>
+      <linearGradient id="sandGrad" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#0e3a52"/>
+        <stop offset="100%" stop-color="#06141e"/>
+      </linearGradient>
+    </defs>
+    <path d="M0 60 Q 180 30 360 50 T 720 45 T 1080 55 T 1440 40 L 1440 120 L 0 120 Z"
+          fill="#0d3648"/>
+    <path d="M0 82 Q 240 60 480 78 T 960 72 T 1440 68 L 1440 120 L 0 120 Z"
+          fill="url(#sandGrad)"/>
+  </svg>
+
+  <div class="weed-cluster wc1">
+    <svg width="50" height="95" viewBox="0 0 50 95">
+      <path d="M 22 95 Q 8 68 22 42 Q 36 16 22 0" stroke="#2d8a6e" stroke-width="5" fill="none" stroke-linecap="round"/>
+      <path d="M 36 95 Q 48 72 38 50 Q 28 28 38 8" stroke="#1f6b54" stroke-width="4" fill="none" stroke-linecap="round"/>
+    </svg>
+  </div>
+  <div class="weed-cluster wc2">
+    <svg width="44" height="80" viewBox="0 0 44 80">
+      <path d="M 20 80 Q 8 58 20 38 Q 32 18 20 0" stroke="#2a7a6a" stroke-width="4.5" fill="none" stroke-linecap="round"/>
+      <path d="M 32 80 Q 42 62 34 44 Q 26 26 34 8" stroke="#1a5c4a" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+    </svg>
+  </div>
+  <div class="weed-cluster wc3">
+    <svg width="46" height="88" viewBox="0 0 46 88">
+      <path d="M 20 88 Q 8 62 20 40 Q 32 18 20 0" stroke="#2d8a6e" stroke-width="4.5" fill="none" stroke-linecap="round"/>
+      <path d="M 34 88 Q 44 66 36 46 Q 28 26 36 6" stroke="#1f6b54" stroke-width="4" fill="none" stroke-linecap="round"/>
+    </svg>
+  </div>
+  <div class="weed-cluster wc4">
+    <svg width="52" height="105" viewBox="0 0 52 105">
+      <path d="M 22 105 Q 8 76 22 48 Q 36 20 22 0" stroke="#35a07d" stroke-width="5.5" fill="none" stroke-linecap="round"/>
+      <path d="M 38 105 Q 50 80 40 54 Q 30 28 40 6" stroke="#257a5e" stroke-width="4.5" fill="none" stroke-linecap="round"/>
+    </svg>
+  </div>
+  <div class="weed-cluster wc5">
+    <svg width="42" height="78" viewBox="0 0 42 78">
+      <path d="M 18 78 Q 6 56 18 36 Q 30 16 18 0" stroke="#2a7a6a" stroke-width="4" fill="none" stroke-linecap="round"/>
+    </svg>
+  </div>
+</div>
+
+<!-- ===================== 切换按钮 ===================== -->
+<button class="switch-btn" id="switchBtn">🔄</button>
+
+<!-- ===================== 鱼 ===================== -->
+<div class="fish-wrapper">
+  <div class="speech-bubble" id="speechBubble">咕噜咕噜~</div>
+
+  <div class="bubble-layer">
+    <div class="bubble b1"></div>
+    <div class="bubble b2"></div>
+    <div class="bubble b3"></div>
+    <div class="bubble b4"></div>
+  </div>
+
+  <div class="fish" id="fish">
+    <svg class="fish-svg active" id="fish1" viewBox="0 0 300 200">
+      <defs>
+        <linearGradient id="f1Body" x1="20%" y1="0%" x2="80%" y2="100%">
+          <stop offset="0%" stop-color="#FFE8A1"/>
+          <stop offset="40%" stop-color="#FFC145"/>
+          <stop offset="100%" stop-color="#FF8C42"/>
+        </linearGradient>
+        <linearGradient id="f1Tail" x1="100%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stop-color="#FFD166"/>
+          <stop offset="100%" stop-color="#FF7B30"/>
+        </linearGradient>
+        <linearGradient id="f1Fin" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#FFE8A1"/>
+          <stop offset="100%" stop-color="#FF9A3C"/>
+        </linearGradient>
+        <radialGradient id="f1Belly" cx="50%" cy="80%" r="50%">
+          <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.8"/>
+          <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0"/>
+        </radialGradient>
+      </defs>
+
+      <path d="M 110 100 Q 60 30 15 45 Q 45 80 50 100 Q 45 120 15 155 Q 60 170 110 100 Z"
+            fill="url(#f1Tail)" stroke="#D35400" stroke-width="3" stroke-linejoin="round"/>
+      <path d="M 65 70 Q 75 85 78 100" fill="none" stroke="#FFE8A1" stroke-width="3" stroke-linecap="round" opacity="0.6"/>
+      <path d="M 65 130 Q 75 115 78 100" fill="none" stroke="#FFE8A1" stroke-width="3" stroke-linecap="round" opacity="0.6"/>
+
+      <path d="M 130 60 Q 160 10 200 50 Q 175 45 130 60 Z"
+            fill="url(#f1Fin)" stroke="#D35400" stroke-width="3" stroke-linejoin="round"/>
+
+      <path d="M 150 150 Q 165 175 190 165 Q 175 155 150 150 Z"
+            fill="url(#f1Fin)" stroke="#D35400" stroke-width="3" stroke-linejoin="round"/>
+
+      <ellipse cx="160" cy="100" rx="80" ry="60"
+               fill="url(#f1Body)" stroke="#D35400" stroke-width="3"/>
+      <ellipse cx="160" cy="100" rx="80" ry="60" fill="url(#f1Belly)"/>
+
+      <path d="M 110 70 Q 160 40 210 70" fill="none" stroke="#FFFFFF"
+            stroke-width="6" stroke-linecap="round" opacity="0.5"/>
+
+      <path d="M 180 65 Q 170 85 170 115 Q 170 135 180 140" fill="none"
+            stroke="#D35400" stroke-width="3" stroke-linecap="round" opacity="0.5"/>
+
+      <circle cx="210" cy="80" r="16" fill="#FFFFFF" stroke="#D35400" stroke-width="2"/>
+      <circle cx="214" cy="80" r="8" fill="#2C1A10"/>
+      <circle cx="217" cy="76" r="3" fill="#FFFFFF"/>
+
+      <ellipse cx="190" cy="115" rx="14" ry="9" fill="#FF5C5C" opacity="0.35"/>
+
+      <path d="M 235 105 Q 245 115 235 120" stroke="#D35400"
+            stroke-width="4" fill="none" stroke-linecap="round"/>
+    </svg>
+
+    <svg class="fish-svg" id="fish2" viewBox="0 0 300 200">
+      <defs>
+        <linearGradient id="f2Body" x1="20%" y1="0%" x2="80%" y2="100%">
+          <stop offset="0%" stop-color="#D6F4FF"/>
+          <stop offset="45%" stop-color="#6EC8FF"/>
+          <stop offset="100%" stop-color="#3D9CF0"/>
+        </linearGradient>
+        <linearGradient id="f2Tail" x1="100%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stop-color="#B6EEFF"/>
+          <stop offset="100%" stop-color="#4FA4F8"/>
+        </linearGradient>
+        <linearGradient id="f2Fin" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#D6F4FF"/>
+          <stop offset="100%" stop-color="#55B5F5"/>
+        </linearGradient>
+        <radialGradient id="f2Belly" cx="50%" cy="80%" r="50%">
+          <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.9"/>
+          <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0"/>
+        </radialGradient>
+      </defs>
+
+      <path d="M 120 100 Q 70 30 25 50 Q 55 80 60 100 Q 55 120 25 150 Q 70 170 120 100 Z"
+            fill="url(#f2Tail)" stroke="#2A7FD0" stroke-width="3" stroke-linejoin="round"/>
+      <path d="M 75 75 Q 85 88 88 100" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" opacity="0.6"/>
+      <path d="M 75 125 Q 85 112 88 100" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" opacity="0.6"/>
+
+      <path d="M 135 60 Q 165 15 205 55 Q 180 50 135 60 Z"
+            fill="url(#f2Fin)" stroke="#2A7FD0" stroke-width="3" stroke-linejoin="round"/>
+
+      <path d="M 155 150 Q 170 175 195 165 Q 180 155 155 150 Z"
+            fill="url(#f2Fin)" stroke="#2A7FD0" stroke-width="3" stroke-linejoin="round"/>
+
+      <ellipse cx="170" cy="100" rx="85" ry="65"
+               fill="url(#f2Body)" stroke="#2A7FD0" stroke-width="3"/>
+      <ellipse cx="170" cy="100" rx="85" ry="65" fill="url(#f2Belly)"/>
+
+      <path d="M 155 45 Q 145 70 145 100 Q 145 130 155 155" fill="none" stroke="#1B62AC" stroke-width="8" stroke-linecap="round" opacity="0.1"/>
+      <path d="M 190 45 Q 180 70 180 100 Q 180 130 190 155" fill="none" stroke="#1B62AC" stroke-width="8" stroke-linecap="round" opacity="0.1"/>
+
+      <path d="M 120 70 Q 170 40 220 70" fill="none" stroke="#FFFFFF"
+            stroke-width="6" stroke-linecap="round" opacity="0.6"/>
+
+      <path d="M 195 65 Q 185 85 185 115 Q 185 135 195 140" fill="none"
+            stroke="#2A7FD0" stroke-width="3" stroke-linecap="round" opacity="0.5"/>
+
+      <circle cx="225" cy="75" r="18" fill="#FFFFFF" stroke="#2A7FD0" stroke-width="2"/>
+      <circle cx="230" cy="75" r="9" fill="#0D2B45"/>
+      <circle cx="234" cy="71" r="3.5" fill="#FFFFFF"/>
+
+      <ellipse cx="205" cy="110" rx="14" ry="9" fill="#FF8C9E" opacity="0.4"/>
+
+      <path d="M 250 100 Q 260 110 250 115" stroke="#2A7FD0"
+            stroke-width="4" fill="none" stroke-linecap="round"/>
+    </svg>
+
+    <svg class="fish-svg" id="fish3" viewBox="0 0 300 200">
+      <defs>
+        <radialGradient id="f3Body" cx="40%" cy="30%" r="70%">
+          <stop offset="0%" stop-color="#FFE8F3"/>
+          <stop offset="50%" stop-color="#FFB3D9"/>
+          <stop offset="100%" stop-color="#FF6FA5"/>
+        </radialGradient>
+        <linearGradient id="f3Spike" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stop-color="#FFB3D9"/>
+          <stop offset="100%" stop-color="#FF6FA5"/>
+        </linearGradient>
+      </defs>
+
+      <g fill="url(#f3Spike)" stroke="#D94A80" stroke-width="2" stroke-linejoin="round">
+        <path d="M 150 30 L 160 5 L 170 30 Z"/>
+        <path d="M 150 30 L 160 5 L 170 30 Z" transform="rotate(30 160 100)"/>
+        <path d="M 150 30 L 160 5 L 170 30 Z" transform="rotate(60 160 100)"/>
+        <path d="M 150 30 L 160 5 L 170 30 Z" transform="rotate(90 160 100)"/>
+        <path d="M 150 30 L 160 5 L 170 30 Z" transform="rotate(120 160 100)"/>
+        <path d="M 150 30 L 160 5 L 170 30 Z" transform="rotate(150 160 100)"/>
+        <path d="M 150 30 L 160 5 L 170 30 Z" transform="rotate(180 160 100)"/>
+        <path d="M 150 30 L 160 5 L 170 30 Z" transform="rotate(210 160 100)"/>
+        <path d="M 150 30 L 160 5 L 170 30 Z" transform="rotate(240 160 100)"/>
+        <path d="M 150 30 L 160 5 L 170 30 Z" transform="rotate(270 160 100)"/>
+        <path d="M 150 30 L 160 5 L 170 30 Z" transform="rotate(300 160 100)"/>
+        <path d="M 150 30 L 160 5 L 170 30 Z" transform="rotate(330 160 100)"/>
+      </g>
+
+      <circle cx="160" cy="100" r="75"
+              fill="url(#f3Body)" stroke="#D94A80" stroke-width="3"/>
+
+      <ellipse cx="125" cy="65" rx="25" ry="18" fill="#FFFFFF" opacity="0.6"
+               transform="rotate(-30 125 65)"/>
+
+      <path d="M 90 130 Q 75 150 90 165 Q 105 150 100 130 Z"
+            fill="url(#f3Spike)" stroke="#D94A80" stroke-width="2"/>
+
+      <circle cx="200" cy="80" r="18" fill="#FFFFFF" stroke="#D94A80" stroke-width="2"/>
+      <circle cx="205" cy="80" r="9" fill="#1A1A1A"/>
+      <circle cx="208" cy="76" r="3" fill="#FFFFFF"/>
+
+      <circle cx="130" cy="80" r="18" fill="#FFFFFF" stroke="#D94A80" stroke-width="2"/>
+      <circle cx="135" cy="80" r="9" fill="#1A1A1A"/>
+      <circle cx="138" cy="76" r="3" fill="#FFFFFF"/>
+
+      <ellipse cx="215" cy="115" rx="14" ry="8" fill="#FF5C9E" opacity="0.4"/>
+      <ellipse cx="105" cy="115" rx="14" ry="8" fill="#FF5C9E" opacity="0.4"/>
+
+      <path d="M 150 115 Q 160 125 170 115" stroke="#D94A80"
+            stroke-width="4" fill="none" stroke-linecap="round"/>
+    </svg>
+  </div>
+</div>
+
+<div class="hint">点屏幕任意地方，捏一捏 ~</div>
+
+<script>
+  var fishEl = document.getElementById('fish');
+  var speechBubble = document.getElementById('speechBubble');
+  var switchBtn = document.getElementById('switchBtn');
+  var currentFish = 1;
+
+  var fishPhrases = {
+    1: ["咕噜咕噜~", "好软呀~", "贴贴~", "最喜欢你了~", "给你吐个泡泡~", "摸摸头好不好嘛~", "今天也要元气满满！"],
+    2: ["嘟嘟嘟~", "我是蓝胖胖！", "看我大眼睛！", "咕噜咕噜~", "我好像...又胖了...", "抱抱你~", "晚安，做个好梦~"],
+    3: ["气死我啦！", "别碰我的刺！", "你再捏我要生气了！", "哼，不理你了！", "再捏我就咬你！", "已气成河豚！", "再捏我就变成气球飞走了！"]
+  };
+
+  var audioCtx = null;
+  function playSound() {
+    try {
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      var osc = audioCtx.createOscillator();
+      var gain = audioCtx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(600, audioCtx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(150, audioCtx.currentTime + 0.1);
+      gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start();
+      osc.stop(audioCtx.currentTime + 0.1);
+    } catch (e) {}
+  }
+
+  function speak() {
+    var list = fishPhrases[currentFish];
+    speechBubble.textContent = list[Math.floor(Math.random() * list.length)];
+    speechBubble.classList.add('show');
+    clearTimeout(window.speechTimer);
+    window.speechTimer = setTimeout(function() {
+      speechBubble.classList.remove('show');
+    }, 2000);
+  }
+
+  var isSquished = false;
+
+  function squish() {
+    if (isSquished) return;
+    isSquished = true;
+    fishEl.classList.add('squish');
+    playSound();
+    if (navigator.vibrate) navigator.vibrate(30);
+    speak();
+  }
+
+  function release() {
+    if (!isSquished) return;
+    isSquished = false;
+    fishEl.classList.remove('squish');
+  }
+
+  document.addEventListener('touchstart', function(e) {
+    if (e.target.closest('.switch-btn')) return;
+    squish();
+  }, { passive: true });
+
+  document.addEventListener('touchend', function() { release(); }, { passive: true });
+  document.addEventListener('touchcancel', function() { release(); }, { passive: true });
+
+  document.addEventListener('mousedown', function(e) {
+    if (e.target.closest('.switch-btn')) return;
+    squish();
+  });
+  document.addEventListener('mouseup', release);
+
+  var lastSwitchTime = 0;
+  function switchFish() {
+    var now = Date.now();
+    if (now - lastSwitchTime < 350) return;
+    lastSwitchTime = now;
+
+    document.getElementById('fish' + currentFish).classList.remove('active');
+    currentFish = currentFish % 3 + 1;
+    document.getElementById('fish' + currentFish).classList.add('active');
+    playSound();
+    speak();
+  }
+
+  switchBtn.addEventListener('click', function(e) {
+    e.preventDefault();
+    switchFish();
+  });
+
+  /* ===================================================== */
+  /* ================  隐藏彩蛋：左下角十连点  ================ */
+  /* ===================================================== */
+  var secretZone = document.getElementById('secretZone');
+  var secretCount = 0;
+  var secretTimer = null;
+  var secretFired = false;
+
+  function secretTap() {
+    if (secretFired) return;
+    secretCount++;
+    clearTimeout(secretTimer);
+
+    if (secretCount >= 10) {
+      secretFired = true;
+      secretCount = 0;
+      // 跳转到米哈游官网
+      window.location.href = 'https://ys.mihoyo.com/';
+      return;
+    }
+
+    // 1.5 秒内没有继续点击，则清零
+    secretTimer = setTimeout(function() {
+      secretCount = 0;
+    }, 1500);
+  }
+
+  secretZone.addEventListener('click', function(e) {
+    // 不阻止冒泡，捏鱼手感保持正常
+    secretTap();
+  });
+</script>
+</body>
+</html>
